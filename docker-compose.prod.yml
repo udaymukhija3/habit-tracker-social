@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: habit-tracker-mysql-prod
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: habit_tracker
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+
+  redis:
+    image: redis:7-alpine
+    container_name: habit-tracker-redis-prod
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_prod_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  mongodb:
+    image: mongo:7
+    container_name: habit-tracker-mongodb-prod
+    environment:
+      MONGO_INITDB_DATABASE: habit_tracker_analytics
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_prod_data:/data/db
+    restart: unless-stopped
+
+  backend:
+    image: ${DOCKER_USERNAME}/habit-tracker-backend:latest
+    container_name: habit-tracker-backend-prod
+    ports:
+      - "8080:8080"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      MONGODB_URI: mongodb://mongodb:27017/habit_tracker_analytics
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - mysql
+      - redis
+      - mongodb
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: ${DOCKER_USERNAME}/habit-tracker-frontend:latest
+    container_name: habit-tracker-frontend-prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mysql_prod_data:
+  redis_prod_data:
+  mongodb_prod_data:
