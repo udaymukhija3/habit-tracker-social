@@ -2,6 +2,27 @@
 
 A comprehensive habit tracking application with social features, built with Spring Boot and React.
 
+---
+
+## ⚠️ WORK IN PROGRESS
+
+**Status**: Active Development
+**Last Updated**: 2025-11-15
+
+### TODO List
+- [ ] Complete mobile app integration and testing
+- [ ] Implement advanced analytics dashboard
+- [ ] Add habit templates and suggestions
+- [ ] Integrate fitness tracker APIs
+- [ ] Enhance real-time notification system
+- [ ] Add comprehensive unit and integration tests
+- [ ] Deploy to production environment
+- [ ] Set up monitoring and logging infrastructure
+
+**Note**: This project requires continued development. See the Roadmap section below for planned features.
+
+---
+
 ## 🚀 Features
 
 ### Core Features
