@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -76,7 +75,6 @@ public class AuthControllerTest {
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername("newuser");
         userDTO.setEmail("newuser@example.com");
-        userDTO.setPassword("password");
         userDTO.setFirstName("New");
         userDTO.setLastName("User");
 
@@ -98,7 +96,6 @@ public class AuthControllerTest {
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername("existinguser");
         userDTO.setEmail("existinguser@example.com");
-        userDTO.setPassword("password");
 
         when(userService.existsByUsername("existinguser")).thenReturn(true);
 

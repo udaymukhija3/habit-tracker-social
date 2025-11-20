@@ -2,6 +2,7 @@ package com.habittracker.service;
 
 import com.habittracker.model.Habit;
 import com.habittracker.model.Streak;
+import com.habittracker.model.HabitCompletion;
 import com.habittracker.repository.StreakRepository;
 import com.habittracker.repository.HabitCompletionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
