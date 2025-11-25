@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/friends")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class FriendshipController {
     
     @Autowired

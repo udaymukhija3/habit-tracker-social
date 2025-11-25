@@ -1,8 +1,6 @@
 package com.habittracker.controller;
 
 import com.habittracker.model.Notification;
-import com.habittracker.model.NotificationStatus;
-import com.habittracker.model.NotificationType;
 import com.habittracker.model.User;
 import com.habittracker.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/notifications")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class NotificationController {
     
     @Autowired
@@ -43,7 +40,6 @@ public class NotificationController {
     
     @PostMapping("/{id}/read")
     public ResponseEntity<?> markAsRead(@PathVariable Long id, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
         notificationService.markAsRead(id);
         return ResponseEntity.ok().build();
     }
@@ -57,7 +53,6 @@ public class NotificationController {
     
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteNotification(@PathVariable Long id, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
         notificationService.deleteNotification(id);
         return ResponseEntity.ok().build();
     }

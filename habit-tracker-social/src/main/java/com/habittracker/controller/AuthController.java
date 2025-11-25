@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*", maxAge = 3600)
 @Tag(name = "Authentication", description = "Authentication and user registration endpoints")
 public class AuthController {
     
@@ -76,7 +75,7 @@ public class AuthController {
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         
-        User createdUser = userService.createUser(user);
+        userService.createUser(user);
         
         return ResponseEntity.ok("User registered successfully!");
     }
