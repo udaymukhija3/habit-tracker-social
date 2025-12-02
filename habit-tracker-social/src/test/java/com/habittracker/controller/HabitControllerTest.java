@@ -13,8 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(HabitController.class)
 public class HabitControllerTest {
@@ -37,8 +40,14 @@ public class HabitControllerTest {
     @MockBean
     private HabitService habitService;
 
-    @MockBean
+    @MockBean(name = "userService")
     private UserService userService;
+
+    @MockBean
+    private com.habittracker.security.RateLimitService rateLimitService;
+
+    @MockBean
+    private com.habittracker.security.JwtUtils jwtUtils;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -48,7 +57,14 @@ public class HabitControllerTest {
         user.setId(1L);
         user.setUsername("testuser");
         user.setEmail("test@example.com");
+        user.setPassword("password");
         return user;
+    }
+
+    @BeforeEach
+    public void setup() {
+        User user = createTestUser();
+        when(userService.loadUserByUsername("testuser")).thenReturn(user);
     }
 
     private Habit createTestHabit() {
@@ -65,7 +81,7 @@ public class HabitControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
+    @WithUserDetails(value = "testuser", userDetailsServiceBeanName = "userService", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testGetUserHabits() throws Exception {
         // Given
         Habit habit = createTestHabit();
@@ -74,13 +90,14 @@ public class HabitControllerTest {
 
         // When & Then
         mockMvc.perform(get("/habits"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Test Habit"))
                 .andExpect(jsonPath("$[0].type").value("HEALTH"));
     }
 
     @Test
-    @WithMockUser(username = "testuser")
+    @WithUserDetails(value = "testuser", userDetailsServiceBeanName = "userService", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testCreateHabit() throws Exception {
         // Given
         HabitDTO habitDTO = new HabitDTO();
@@ -105,7 +122,7 @@ public class HabitControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
+    @WithUserDetails(value = "testuser", userDetailsServiceBeanName = "userService", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testGetHabit() throws Exception {
         // Given
         Habit habit = createTestHabit();
@@ -119,7 +136,7 @@ public class HabitControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
+    @WithUserDetails(value = "testuser", userDetailsServiceBeanName = "userService", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testGetHabitNotFound() throws Exception {
         // Given
         when(habitService.findById(999L)).thenReturn(Optional.empty());
@@ -130,7 +147,7 @@ public class HabitControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
+    @WithUserDetails(value = "testuser", userDetailsServiceBeanName = "userService", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testUpdateHabit() throws Exception {
         // Given
         Habit habit = createTestHabit();
@@ -154,7 +171,7 @@ public class HabitControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
+    @WithUserDetails(value = "testuser", userDetailsServiceBeanName = "userService", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testDeleteHabit() throws Exception {
         // Given
         Habit habit = createTestHabit();
@@ -170,7 +187,7 @@ public class HabitControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
+    @WithUserDetails(value = "testuser", userDetailsServiceBeanName = "userService", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testCompleteHabit() throws Exception {
         // Given
         Habit habit = createTestHabit();
@@ -191,7 +208,7 @@ public class HabitControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
+    @WithUserDetails(value = "testuser", userDetailsServiceBeanName = "userService", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testGetHabitCompletions() throws Exception {
         // Given
         Habit habit = createTestHabit();
@@ -209,4 +226,3 @@ public class HabitControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1));
     }
 }
-
