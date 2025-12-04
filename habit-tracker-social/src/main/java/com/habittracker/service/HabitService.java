@@ -30,6 +30,9 @@ public class HabitService {
     @Autowired
     private StreakService streakService;
 
+    @Autowired
+    private ActivityFeedService activityFeedService;
+
     public Habit createHabit(Habit habit) {
         Habit savedHabit = habitRepository.save(habit);
         // Initialize streak for the habit
@@ -84,6 +87,9 @@ public class HabitService {
 
         // Update streak
         streakService.updateStreak(habit);
+
+        // Create activity feed entry for friends
+        activityFeedService.createHabitCompletionActivity(habit.getUser(), habit.getName());
 
         return savedCompletion;
     }

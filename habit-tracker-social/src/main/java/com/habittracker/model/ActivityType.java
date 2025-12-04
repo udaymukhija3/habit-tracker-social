@@ -1,0 +1,11 @@
+package com.habittracker.model;
+
+public enum ActivityType {
+    HABIT_COMPLETED,
+    STREAK_MILESTONE,
+    CHALLENGE_JOINED,
+    CHALLENGE_COMPLETED,
+    PARTNERSHIP_STARTED,
+    ACHIEVEMENT_UNLOCKED,
+    HABIT_SHARED
+}
