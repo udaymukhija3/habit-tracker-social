@@ -34,6 +34,9 @@ public class ActivityFeedService {
     @Autowired
     private NotificationWebSocketHandler webSocketHandler;
 
+    @Autowired
+    private NotificationService notificationService;
+
     /**
      * Create a new activity
      */
@@ -58,10 +61,12 @@ public class ActivityFeedService {
         ActivityFeed activity = new ActivityFeed(user, ActivityType.HABIT_COMPLETED, habitName, description);
         ActivityFeed savedActivity = activityFeedRepository.save(activity);
 
-        // Notify friends
+        // Notify friends via WebSocket and push notifications
         List<User> friends = userRepository.findFriendsByUserId(user.getId());
         for (User friend : friends) {
             webSocketHandler.sendFriendActivity(friend.getId(), savedActivity);
+            // Send social proof notification
+            notificationService.createFriendCompletedHabitNotification(friend, user.getUsername(), habitName);
         }
 
         return savedActivity;
@@ -79,10 +84,13 @@ public class ActivityFeedService {
 
         ActivityFeed savedActivity = activityFeedRepository.save(activity);
 
-        // Notify friends
+        // Notify friends via WebSocket and push notifications
         List<User> friends = userRepository.findFriendsByUserId(user.getId());
         for (User friend : friends) {
             webSocketHandler.sendFriendActivity(friend.getId(), savedActivity);
+            // Send streak milestone notification
+            notificationService.createFriendStreakMilestoneNotification(
+                    friend, user.getUsername(), habitName, streakCount);
         }
 
         return savedActivity;

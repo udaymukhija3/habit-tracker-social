@@ -106,4 +106,45 @@ public class NotificationService {
         String title = "Motivational Message 💪";
         createNotification(user, title, message, NotificationType.MOTIVATIONAL);
     }
+
+    // ========== Social Proof Notifications ==========
+
+    /**
+     * Notify user when a friend completes a habit
+     */
+    public void createFriendCompletedHabitNotification(User user, String friendName, String habitName) {
+        String title = "Friend Activity! 🎯";
+        String message = String.format("%s just completed '%s'!", friendName, habitName);
+        createNotification(user, title, message, NotificationType.FRIEND_COMPLETED_HABIT);
+    }
+
+    /**
+     * Daily summary of friend activities (social proof)
+     */
+    public void createFriendsActiveTodayNotification(User user, int friendCount) {
+        String title = "Friends Are Active! 🔥";
+        String message = String.format("%d of your friends completed habits today. Don't get left behind!",
+                friendCount);
+        createNotification(user, title, message, NotificationType.FRIENDS_ACTIVE_TODAY);
+    }
+
+    /**
+     * Notify when a friend reaches a streak milestone
+     */
+    public void createFriendStreakMilestoneNotification(User user, String friendName, String habitName,
+            Integer streakCount) {
+        String title = "Friend Milestone! 🏆";
+        String message = String.format("%s reached a %d-day streak for '%s'! Send them encouragement!",
+                friendName, streakCount, habitName);
+        createNotification(user, title, message, NotificationType.FRIEND_STREAK_MILESTONE);
+    }
+
+    /**
+     * Notify when accountability partner needs encouragement
+     */
+    public void createPartnerNeedsEncouragementNotification(User user, String partnerName) {
+        String title = "Support Your Partner 🤝";
+        String message = String.format("%s hasn't completed their habits today. Send them a message!", partnerName);
+        createNotification(user, title, message, NotificationType.PARTNER_NEEDS_ENCOURAGEMENT);
+    }
 }
