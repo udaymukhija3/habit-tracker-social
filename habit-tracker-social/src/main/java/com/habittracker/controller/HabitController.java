@@ -6,12 +6,13 @@ import com.habittracker.model.HabitCompletion;
 import com.habittracker.model.User;
 import com.habittracker.service.HabitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,9 +23,9 @@ public class HabitController {
     private HabitService habitService;
 
     @GetMapping
-    public ResponseEntity<List<Habit>> getUserHabits(Authentication authentication) {
+    public ResponseEntity<Page<Habit>> getUserHabits(Authentication authentication, Pageable pageable) {
         User user = (User) authentication.getPrincipal();
-        List<Habit> habits = habitService.findActiveHabitsByUserId(user.getId());
+        Page<Habit> habits = habitService.findActiveHabitsByUserId(user.getId(), pageable);
         return ResponseEntity.ok(habits);
     }
 
@@ -109,8 +110,9 @@ public class HabitController {
     }
 
     @GetMapping("/{id}/completions")
-    public ResponseEntity<List<HabitCompletion>> getHabitCompletions(@PathVariable Long id,
-            Authentication authentication) {
+    public ResponseEntity<Page<HabitCompletion>> getHabitCompletions(@PathVariable Long id,
+            Authentication authentication,
+            Pageable pageable) {
         User user = (User) authentication.getPrincipal();
         Optional<Habit> habit = habitService.findById(id);
 
@@ -118,7 +120,7 @@ public class HabitController {
             return ResponseEntity.notFound().build();
         }
 
-        List<HabitCompletion> completions = habitService.getHabitCompletions(id);
+        Page<HabitCompletion> completions = habitService.getHabitCompletions(id, pageable);
         return ResponseEntity.ok(completions);
     }
 }

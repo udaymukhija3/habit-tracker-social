@@ -8,6 +8,8 @@ import com.habittracker.repository.HabitCompletionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +51,11 @@ public class HabitService {
         return habitRepository.findByUserIdAndIsActiveTrue(userId);
     }
 
+    // Paginated version
+    public Page<Habit> findActiveHabitsByUserId(Long userId, Pageable pageable) {
+        return habitRepository.findByUserIdAndIsActiveTrue(userId, pageable);
+    }
+
     public List<Habit> findByType(HabitType type) {
         return habitRepository.findByTypeAndIsActiveTrue(type);
     }
@@ -83,6 +90,11 @@ public class HabitService {
 
     public List<HabitCompletion> getHabitCompletions(Long habitId) {
         return habitCompletionRepository.findByHabitIdOrderByCompletionDateDesc(habitId);
+    }
+
+    // Paginated version
+    public Page<HabitCompletion> getHabitCompletions(Long habitId, Pageable pageable) {
+        return habitCompletionRepository.findByHabitIdOrderByCompletionDateDesc(habitId, pageable);
     }
 
     public List<HabitCompletion> getHabitCompletionsByDateRange(Long habitId, LocalDateTime startDate,
