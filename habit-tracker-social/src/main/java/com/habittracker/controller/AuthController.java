@@ -21,62 +21,62 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication", description = "Authentication and user registration endpoints")
 public class AuthController {
-    
+
     @Autowired
     private AuthenticationManager authenticationManager;
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private JwtUtils jwtUtils;
-    
+
     @Operation(summary = "User login", description = "Authenticate user and return JWT token")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Login successful"),
-        @ApiResponse(responseCode = "401", description = "Invalid credentials")
+            @ApiResponse(responseCode = "200", description = "Login successful"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
-        
+
         User user = (User) authentication.getPrincipal();
-        
+
         // Update last login
         userService.updateLastLogin(user.getId());
-        
-        return ResponseEntity.ok(new JwtResponse(jwt, user.getId(), user.getUsername(), 
-                                               user.getEmail(), user.getRole()));
+
+        return ResponseEntity.ok(new JwtResponse(jwt, user.getId(), user.getUsername(),
+                user.getEmail(), user.getRole()));
     }
-    
+
     @Operation(summary = "User registration", description = "Register a new user account")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User registered successfully"),
-        @ApiResponse(responseCode = "400", description = "Username or email already exists")
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Username or email already exists")
     })
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO userDTO) {
         if (userService.existsByUsername(userDTO.getUsername())) {
             return ResponseEntity.badRequest().body("Error: Username is already taken!");
         }
-        
+
         if (userService.existsByEmail(userDTO.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
-        
+
         User user = new User(userDTO.getUsername(), userDTO.getEmail(), userDTO.getPassword());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
-        
+
         userService.createUser(user);
-        
+
         return ResponseEntity.ok("User registered successfully!");
     }
 }
